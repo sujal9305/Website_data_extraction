@@ -136,7 +136,7 @@ def get_internal_links(base_url, soup):
 # 4. PRIORITIZE IMPORTANT PAGES
 # -----------------------------------
 
-def prioritize_links(links):
+def Main_links(links):
     priority_keywords = [
         "about", "service", "solution", "product",
         "company", "team", "contact", "work", "case"
@@ -179,7 +179,7 @@ def extract_multiple_pages(base_url):
 
     # get links
     links = get_internal_links(base_url, soup)
-    links = prioritize_links(links)
+    links = Main_links(links)
 
     print("Top links:", links[:5])
 
