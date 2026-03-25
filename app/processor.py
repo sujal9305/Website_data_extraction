@@ -49,14 +49,14 @@ def generate_summary(content):
         output = response.choices[0].message.content.strip()
 
         
-        data = json.loads(output) #Convert string → JSON safely
+        data = json.loads(output) 
 
         return data
 
     except Exception as e:
         print("AI Error:", e)
 
-        # fallback response
+        
         return {
             "summary": content[:200],
             "business_type": "Unknown",

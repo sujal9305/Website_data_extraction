@@ -7,11 +7,6 @@ from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.chrome.options import Options
 import time
 
-
-# -----------------------------------
-# 1. FETCH HTML (SMART HYBRID)
-# -----------------------------------
-
 def fetch_html_requests(url):
     try:
         headers = {"User-Agent": "Mozilla/5.0"}
@@ -20,7 +15,6 @@ def fetch_html_requests(url):
         return response.text
     except:
         return None
-
 
 def fetch_html_selenium(url):
     try:
@@ -57,10 +51,6 @@ def fetch_html(url):
     return html
 
 
-# -----------------------------------
-# 2. EXTRACT DATA FROM ONE PAGE
-# -----------------------------------
-
 def extract_data(html):
     soup = BeautifulSoup(html, "html.parser")
 
@@ -95,10 +85,6 @@ def extract_data(html):
     }
 
 
-# -----------------------------------
-# 3. GET ALL INTERNAL LINKS (DYNAMIC)
-# -----------------------------------
-
 def get_internal_links(base_url, soup):
     links = set()
     base_domain = urlparse(base_url).netloc
@@ -112,18 +98,15 @@ def get_internal_links(base_url, soup):
         full_url = urljoin(base_url, href)
         parsed = urlparse(full_url)
 
-        # only internal links
         if parsed.netloc != base_domain:
             continue
 
-        # skip junk pages
         if any(skip in full_url.lower() for skip in [
             "login", "signup", "cart", "privacy",
             "terms", "policy", "cookie", "account"
         ]):
             continue
 
-        # skip file types
         if full_url.endswith((".jpg", ".png", ".pdf", ".svg", ".zip")):
             continue
 
@@ -131,10 +114,6 @@ def get_internal_links(base_url, soup):
 
     return list(links)
 
-
-# -----------------------------------
-# 4. PRIORITIZE IMPORTANT PAGES
-# -----------------------------------
 
 def Main_links(links):
     priority_keywords = [
@@ -148,10 +127,6 @@ def Main_links(links):
     return sorted(links, key=score, reverse=True)
 
 
-# -----------------------------------
-# 5. MULTI-PAGE EXTRACTION (SMART)
-# -----------------------------------
-
 def extract_multiple_pages(base_url):
     visited = set()
     all_content = []
@@ -164,7 +139,6 @@ def extract_multiple_pages(base_url):
 
     soup = BeautifulSoup(html, "html.parser")
 
-    # main page
     main_data = extract_data(html)
     title = main_data["title"]
 
@@ -177,14 +151,12 @@ def extract_multiple_pages(base_url):
     all_headings.extend(main_data["headings"])
     visited.add(base_url)
 
-    # get links
     links = get_internal_links(base_url, soup)
     links = Main_links(links)
 
     print("Top links:", links[:5])
 
-    # crawl top pages
-    for link in links[:5]:  # limit pages
+    for link in links[:5]: 
         if link in visited:
             continue
 
@@ -207,7 +179,7 @@ def extract_multiple_pages(base_url):
         except Exception as e:
             print("Error:", link, e)
 
-    # merge
+
     final_content = " ".join(all_content)
     final_headings = list(set(all_headings))
 
@@ -215,5 +187,5 @@ def extract_multiple_pages(base_url):
         "title": title,
         "headings": final_headings,
         "content": final_content,
-        "pages": pages_data   # NEW (structured per page)
+        "pages": pages_data  
     }
